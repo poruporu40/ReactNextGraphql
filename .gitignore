@@ -2,6 +2,6 @@
 .next
 .devcontainer*
 .node-version
-.env
+.env*
 node_modules
 public
