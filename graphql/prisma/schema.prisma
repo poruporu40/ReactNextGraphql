@@ -1,0 +1,35 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  auth0UserId String   @unique @map("auth0_user_id")
+  email         String   @unique
+  name          String?
+  avatarPath   String?   @map("avatar_path")
+  auth0AvatarUrl  String?  @map("auth0_avatar_url")
+  profile       String?
+  location      String?
+  website       String? 
+  posts         Post[]
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  author_id  Int?
+  author    User?     @relation(fields: [author_id], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}

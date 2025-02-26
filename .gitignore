@@ -1,0 +1,7 @@
+.DS_Store
+.next
+.devcontainer*
+.node-version
+.env
+node_modules
+public

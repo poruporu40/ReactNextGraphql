@@ -1,0 +1,32 @@
+# ベースイメージを指定
+FROM node:16-alpine
+
+# 作業ディレクトリを作成
+WORKDIR /app
+
+# package.jsonとpackage-lock.jsonをコピー
+COPY package*.json ./
+
+# 依存関係をインストール
+RUN npm install
+
+# ソースコードをコピー
+COPY . .
+
+# マイグレーションの実行 ここで実行するとmariadbコンテナが起動していない事があるからやらない。docker-compose upした後にコンテナ内に入ってこのコマンドを実行する
+#RUN npx prisma migrate dev --name init
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# TypeScriptをコンパイル
+#RUN npm run build
+
+# ポート番号を設定
+EXPOSE 4000
+
+# アプリケーションを起動
+CMD ["npm", "run", "dev"]
+
+# コンテナを維持するための無限ループ
+#CMD ["tail", "-f", "/dev/null"]

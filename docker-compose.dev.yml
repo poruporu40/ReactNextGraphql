@@ -1,0 +1,50 @@
+services:
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MARIADB_ROOT_PASSWORD: example
+      MARIADB_DATABASE: mydatabase
+    ports:
+      - '3306:3306'
+    networks:
+      - mynetwork
+    volumes:
+      - mariadb_data:/var/lib/mysql  # MariaDB のデータ永続化
+
+  graphql-server:
+    build:
+      context: ./graphql
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - mariadb
+    ports:
+      - '4000:4000'
+    networks:
+      - mynetwork
+    volumes:
+      - ./graphql:/app
+      - /app/node_modules # node_modulesはマウントしない。コンテナ内でnpm installなどをする。
+
+  nextjs-server:
+    build:
+      context: ./next
+      dockerfile: Dockerfile.dev
+    ports:
+      - '3000:3000'
+      - '6006:6006'  # Storybookのポートを追加
+    depends_on:
+      - graphql-server
+    networks:
+      - mynetwork
+    volumes:
+      - ./next:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  mariadb_data:
